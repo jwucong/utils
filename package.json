@@ -2,7 +2,6 @@
   "name": "utils",
   "version": "1.0.0",
   "description": "javascript utils",
-  "main": "index.js",
   "scripts": {
     "build": "gulp"
   },
