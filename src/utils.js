@@ -3,7 +3,7 @@ function parseUrl(url = '') {
   const reg = /^(?:([\w.+-]+):\/\/)?(?:([^\s:]+):([^@]*)@)?([^\s:\/]+)(?::(\d+))?(\/[^\s?#]*)?(\?[^\s#]*)?(#\S*$)?/i
   const result = reg.exec(link) || []
   return {
-    href: result[0] || '',
+    href: result[0] || "",
     protocol: result[1] || '',
     username: result[2] || '',
     password: result[3] || '',
