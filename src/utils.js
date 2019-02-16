@@ -1,3 +1,115 @@
+/**
+ * 获取或者判断值类型
+ * @param value {any}
+ * @param type {string}
+ * @return {type ? boolean : string}
+ */
+const is = (value, type) => {
+  var c = {}.toString.call(value).replace(/^\[object\s(\w+)\]$/, '$1')
+  return type ? c.toLowerCase() === type.toLowerCase() : c
+}
+
+/**
+ * 判断是否为 Number
+ * @param value
+ * @return {boolean}
+ */
+const isNumber = value => is(value, 'Number')
+
+
+/**
+ * 判断是否为 String
+ * @param value
+ * @return {boolean}
+ */
+const isString = value => is(value, 'String')
+
+
+/**
+ * 判断是否为 Array
+ * @param value
+ * @return {boolean}
+ */
+const isArray = value => is(value, 'Array')
+
+
+/**
+ * 判断是否为 Object
+ * @param value
+ * @return {boolean}
+ */
+const isObject = value => is(value, 'Object')
+
+
+/**
+ * 判断是否为 Boolean
+ * @param value
+ * @return {boolean}
+ */
+const isBoolean = value => is(value, 'Boolean')
+
+
+/**
+ * 判断是否为 Function
+ * @param value
+ * @return {boolean}
+ */
+const isFunction = value => is(value, 'Function')
+
+
+/**
+ * 判断是否为 RegExp
+ * @param value
+ * @return {boolean}
+ */
+const isRegExp = value => is(value, 'RegExp')
+
+
+/**
+ * 判断是否为 Date
+ * @param value
+ * @return {boolean}
+ */
+const isDate = value => is(value, 'Date')
+
+
+/**
+ * 判断是否为 Symbol
+ * @param value
+ * @return {boolean}
+ */
+const isSymbol = value => is(value, 'Symbol')
+
+
+/**
+ * 判断是否为 null
+ * @param value
+ * @return {boolean}
+ */
+const isNull = value => is(value, 'Null')
+
+
+/**
+ * 判断是否为 undefined
+ * @param value
+ * @return {boolean}
+ */
+const isUndefined = value => is(value, 'Undefined')
+
+
+/**
+ * 判断是否为 NaN
+ * @param value
+ * @return {boolean}
+ */
+const isNaN = value => isNumber(value) && value !== value
+
+
+/**
+ * 解析URL
+ * @param url
+ * @returns object
+ */
 function parseUrl(url = '') {
   const link = decodeURIComponent(url)
   const reg = /^(?:([\w.+-]+):\/\/)?(?:([^\s:]+):([^@]*)@)?([^\s:\/]+)(?::(\d+))?(\/[^\s?#]*)?(\?[^\s#]*)?(#\S*$)?/i
@@ -15,6 +127,11 @@ function parseUrl(url = '') {
   }
 }
 
+
+/**
+ * 获取URL查询参数
+ * @param url
+ */
 function getUrlQuery(url = '') {
   const reg = /[?&]([^=&#]+)=([^&#]*)/ig
   const result = {}
@@ -26,6 +143,7 @@ function getUrlQuery(url = '') {
   }
   return result;
 }
+
 
 /**
  * 生成范围随机数 min <= x <= max
@@ -56,29 +174,72 @@ function paging(data, size) {
   return result;
 }
 
+
 /**
  * 文件大小转为字节
- * @param size
+ * @param size {string}
  * @return {number}
  */
-function toByte(size) {
-  const valueReg = /^(\d+(?:\.\d+)?)/;
-  if(!valueReg.test(size)) {
-    throw new Error(`无法识别的文件大小：${size}`)
+function toBytes(size, base = 1024) {
+  const valReg = /^\s*\+?((?:\.\d+)|(?:\d+(?:\.\d+)?))(?!\.|\d)\s*([a-zA-Z]*)/i;
+  const match = valReg.exec(size);
+  if (!match) {
+    throw new Error(`Unresolvable value: ${size}`)
   }
+  const value = +match[1];
+  const unit = match[2] || 'B';
   const units = ['B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y', 'B', 'N', 'D'];
-  const value = RegExp.$1
-  const unit = size.replace(valueReg, '').trim() || 'B'
   const index = units.findIndex((item, i) => {
     const str = '^' + item + (i === 0 ? '(?:yte)' : 'b') + '?$'
     const reg = new RegExp(str, 'i')
     return reg.test(unit)
   })
-  if(index === -1) {
-    throw new Error(`无法识别的字节单位：${unit}`)
+  if (index < 0) {
+    throw new Error(`Unresolvable unit: ${unit}`)
   }
-  const byte = Math.ceil(value * Math.pow(1024, index))
-  return byte
+  return Math.ceil(value * Math.pow(base, index))
+}
+
+
+/**
+ * 字节格式化
+ * @param bytes
+ * @param digits
+ * @param base
+ * @return {string}
+ */
+function formatBytes(bytes, base = 1024, digits = 2) {
+  const MAX_SIZE = Math.pow(base, 11)
+  if (bytes < 0 || bytes > MAX_SIZE) {
+    throw new Error(bytes < 0 ? 'Bytes can not be negative' : 'The number of bytes is too large')
+  }
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB', 'NB', 'DB']
+  const n = Math.floor(Math.log(bytes) / Math.log(base))
+  const size = (bytes / Math.pow(base, n)).toFixed(digits)
+  return size + units[n]
+}
+
+
+/**
+ * 日期格式化
+ * @param date
+ * @param formatter
+ * @return {string}
+ */
+function formatDate(date = Date.now(), formatter = 'yyyy-MM-dd hh:mm:ss') {
+  const fix = n => n < 10 ? '0' + n : n + ''
+  const d = new Date(date)
+  const map = {
+    'yyyy': d.getFullYear(),
+    'MM': d.getMonth() + 1,
+    'dd': d.getDate(),
+    'hh': d.getHours(),
+    'mm': d.getMinutes(),
+    'ss': d.getSeconds()
+  }
+  return Object.keys(map).reduce((acc, key) => {
+    return acc.replace(new RegExp(key, 'g'), fix(map[key]))
+  }, formatter)
 }
 
 
@@ -106,6 +267,7 @@ function hexToRGB(hex, toFixed = 1) {
   return str;
 }
 
+
 /**
  * RGB转16进制值
  * @param r
@@ -118,138 +280,6 @@ function hexToRGB(hex, toFixed = 1) {
  */
 function RGBToHex(r, g, b) {
   return ((r << 16) + (g << 8) + b).toString(16).padStart(6, '0');
-}
-
-/**
- * 获取或者判断值类型
- * @param value
- * @param type
- * @return {type ? boolean : string}
- * @private
- */
-function is(value, type) {
-  var className = {}.toString.call(value).replace(/^\[object\s(\w+)\]$/, '$1')
-  return type ? className.toLowerCase() === type.toLowerCase() : className
-}
-
-/**
- * 判断是否为 Number
- * @param value
- * @return {boolean}
- * @private
- */
-function isNumber(value) {
-  return is(value, 'Number')
-}
-
-/**
- * 判断是否为 String
- * @param value
- * @return {boolean}
- * @private
- */
-function isString(value) {
-  return is(value, 'String')
-}
-
-/**
- * 判断是否为 Array
- * @param value
- * @return {boolean}
- * @private
- */
-function isArray(value) {
-  return is(value, 'Array')
-}
-
-/**
- * 判断是否为 Object
- * @param value
- * @return {boolean}
- * @private
- */
-function isObject(value) {
-  return is(value, 'Object')
-}
-
-/**
- * 判断是否为 Boolean
- * @param value
- * @return {boolean}
- * @private
- */
-function isBoolean(value) {
-  return is(value, 'Boolean')
-}
-
-/**
- * 判断是否为 Function
- * @param value
- * @return {boolean}
- * @private
- */
-function isFunction(value) {
-  return is(value, 'Function')
-}
-
-/**
- * 判断是否为 RegExp
- * @param value
- * @return {boolean}
- * @private
- */
-function isRegExp(value) {
-  return is(value, 'RegExp')
-}
-
-/**
- * 判断是否为 Date
- * @param value
- * @return {boolean}
- * @private
- */
-function isDate(value) {
-  return is(value, 'Date')
-}
-
-/**
- * 判断是否为 Symbol
- * @param value
- * @return {boolean}
- * @private
- */
-function isSymbol(value) {
-  return is(value, 'Symbol')
-}
-
-/**
- * 判断是否为 null
- * @param value
- * @return {boolean}
- * @private
- */
-function isNull(value) {
-  return is(value, 'Null')
-}
-
-/**
- * 判断是否为 undefined
- * @param value
- * @return {boolean}
- * @private
- */
-function isUndefined(value) {
-  return is(value, 'Undefined')
-}
-
-/**
- * 判断是否为 NaN
- * @param value
- * @return {boolean}
- * @private
- */
-function isNaN(value) {
-  return isNumber(value) && value !== value
 }
 
 
@@ -307,33 +337,6 @@ function toArray(arrayLike) {
 }
 
 /**
- * 带单位的文件大小转为不带单位的bytes字节数
- * @param size
- * @param base
- * @return {number}
- * @private
- */
-function toBytes(size, base = 1024) {
-  const valueReg = /^(\d+(?:\.\d+)?)/;
-  if (!valueReg.test(size)) {
-    throw new Error('Unresolved: ' + size)
-  }
-  const units = ['B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y', 'B', 'N', 'D'];
-  const value = RegExp.$1
-  const unit = size.toString().replace(valueReg, '').trim() || 'B'
-  const index = units.findIndex((item, i) => {
-    const str = '^' + item + (i === 0 ? '(?:yte)' : 'b') + '?$'
-    const reg = new RegExp(str, 'i')
-    return reg.test(unit)
-  })
-  if (index === -1) {
-    throw new Error('Unrecognized unit: ' + unit)
-  }
-  const bytes = Math.ceil(value * Math.pow(base, index))
-  return bytes
-}
-
-/**
  * 秒转换为dd天hh时mm分ss秒
  * @param s 秒数
  * @return {string}
@@ -351,46 +354,6 @@ function S2DHMS(s) {
   return str
 }
 
-/**
- * 日期格式化
- * @param date
- * @param formatter
- * @return {string}
- */
-function formatDate(date = Date.now(), formatter = 'yyyy-MM-dd hh:mm:ss') {
-  const fix = n => n < 10 ? '0' + n : n + ''
-  const d = new Date(date)
-  const map = {
-    'yyyy': d.getFullYear(),
-    'MM': fix(d.getMonth() + 1),
-    'dd': fix(d.getDate()),
-    'hh': fix(d.getHours()),
-    'mm': fix(d.getMinutes()),
-    'ss': fix(d.getSeconds())
-  }
-  Object.keys(map).forEach(function (key) {
-    formatter = formatter.replace(new RegExp(key, 'g'), map[key])
-  })
-  return formatter
-}
-
-/**
- * 字节格式化
- * @param bytes
- * @param digits
- * @param base
- * @return {string}
- * @private
- */
-function formatBytes(bytes, digits = 2, base = 1024) {
-  if (bytes <= 0) {
-    return (0).toFixed(digits)
-  }
-  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB', 'NB', 'DB']
-  const e = Math.floor(Math.log(bytes) / Math.log(base))
-  const size = (bytes / Math.pow(base, e)).toFixed(digits)
-  return e < units.length ? size + units[e] : 'bytes too large'
-}
 
 /**
  * 倒计时
@@ -430,14 +393,11 @@ function countdown(options) {
  * @return {string}
  * @private
  */
-function replace(template, data, markers = ['{{', '}}']) {
-  for (let key in data) {
-    if (data.hasOwnProperty(key)) {
-      const reg = new RegExp(markers[0] + '\\s*' + key + '\\s*' + markers[1], 'g');
-      template = template.replace(reg, () => data[key]);
-    }
-  }
-  return template;
+function replace(template, data = {}, markers = ['{{', '}}']) {
+  return Object.keys(data).reduce((acc, key) => {
+    const reg = new RegExp(markers[0] + '\\s*' + key + '\\s*' + markers[1], 'g')
+    return acc.replace(reg, () => data[key]);
+  }, template)
 }
 
 
