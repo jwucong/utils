@@ -106,6 +106,47 @@ const isNaN = value => isNumber(value) && value !== value
 
 
 /**
+ * 固定电话校验
+ * @param value
+ * @returns {boolean}
+ */
+const isTelephoneNum = value => {
+  const reg = /^/
+  return reg.test(value)
+}
+
+
+/**
+ * 手机号码校验
+ * @param value
+ * @returns {boolean}
+ */
+const isCellphoneNum = value => {
+  const reg = /^(\+86)?\s*1[3456789]\d{9}\s*$/
+  return reg.test(value)
+}
+
+/**
+ * 邮箱校验
+ * @param value
+ */
+const isEmail = value => {
+
+}
+
+
+/**
+ * 身份证号码校验
+ * @param value
+ */
+const isIdCardNum = value => {
+  const reg = /^\d{6}([1700-2020][01][1-9][0-3][0-9]\d{3}[\dx])/i
+  return reg.test(value)
+}
+
+
+
+/**
  * 解析URL
  * @param url
  * @returns object
