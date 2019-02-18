@@ -55,9 +55,9 @@ const transformAndCompress = () => {
   }
   return gulp.src('src/utils.js')
     .pipe(rollup(rollupOptions))
+    .pipe(rename('utils.es5.js'))
     .pipe(uncomment(uncommentOptions))
     .pipe(prettier(prettierOptions))
-    .pipe(rename('utils.es5.js'))
     .pipe(gulp.dest('dist/'))
     .pipe(uglify(uglifyOptions))
     .pipe(rename('utils.es5.min.js'))

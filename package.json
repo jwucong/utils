@@ -34,5 +34,8 @@
     "rollup": "^1.1.2",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-node-resolve": "^4.0.0"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.2.5"
   }
 }

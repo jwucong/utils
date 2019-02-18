@@ -106,6 +106,14 @@ const isNaN = value => isNumber(value) && value !== value
 
 
 /**
+ * 判断是否为闰年
+ * @param value
+ * @return {boolean}
+ */
+const isLeapYear = value => value % 4 === 0 && value % 100 !== 0 || value % 400 === 0
+
+
+/**
  * 固定电话校验
  * @param value
  * @returns {boolean}
@@ -140,40 +148,61 @@ const isEmail = value => {
  * @param value
  */
 const isIdCardNum = value => {
-  const reg = /^\d{6}([1700-2020][01][1-9][0-3][0-9]\d{3}[\dx])/i
-  return reg.test(value)
+  // 地址码 出生日期码 顺序码 校验码
+  const reg = /^\s*((\d{2})(\d{2})(\d{2})(\d{4})(\d{2})(\d{2})(\d{3}))([\dx])\s*$/i
+  const match = reg.exec(value)
+  if(!match) {
+    return false
+  }
+  const cardYear = match[5]
+  const cardMonth = match[6]
+  const cardDay = match[7]
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  const months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  const isLeapYear = y => y % 4 === 0 && y % 100 !== 0 || y % 400 === 0
+  const getMonthMaxDays = (y, m) => m === 1 && isLeapYear(y) ? 29 : months[m]
+  if(
+    cardYear > year
+    || cardMonth == 0
+    || cardMonth > 12
+    || cardDay == 0
+    || cardDay > getMonthMaxDays(cardYear, cardMonth - 1)
+  ) {
+    return false
+  }
+  if(cardYear === year) {
+    if(cardMonth > month) {
+      return false
+    }
+    if(cardMonth == month && cardDay > day) {
+      return false
+    }
+  }
+  const ratios = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+  const sum = match[1].split('').reduce((acc, item, i) => acc + item * ratios[i], 0)
+  const ns = [1, 0, 'X', 9, 8, 7, 6, 5, 4, 3, 2]
+  const n = '' + ns[sum % 11]
+  return n === match[9].toUpperCase()
 }
-
 
 
 /**
- * 解析URL
- * @param url
- * @returns object
+ * 生成范围随机数 min <= x <= max
+ * @param min
+ * @param max
+ * @return {number}
  */
-function parseUrl(url = '') {
-  const link = decodeURIComponent(url)
-  const reg = /^(?:([\w.+-]+):\/\/)?(?:([^\s:]+):([^@]*)@)?([^\s:\/]+)(?::(\d+))?(\/[^\s?#]*)?(\?[^\s#]*)?(#\S*$)?/i
-  const result = reg.exec(link) || []
-  return {
-    href: result[0] || "",
-    protocol: result[1] || '',
-    username: result[2] || '',
-    password: result[3] || '',
-    hostname: result[4] || '',
-    port: +result[5] || 80,
-    path: result[6] || '/',
-    query: getUrlQuery(result[7] || ''),
-    hash: result[8] || ''
-  }
-}
+const random = (min, max) => Math.round(Math.random() * (max - min) + min);
 
 
 /**
  * 获取URL查询参数
  * @param url
  */
-function getUrlQuery(url = '') {
+const getUrlQuery = (url = '') => {
   const reg = /[?&]([^=&#]+)=([^&#]*)/ig
   const result = {}
   let p = null
@@ -187,14 +216,27 @@ function getUrlQuery(url = '') {
 
 
 /**
- * 生成范围随机数 min <= x <= max
- * @param min
- * @param max
- * @return {number}
+ * 解析URL
+ * @param url
+ * @returns object
  */
-function random(min, max) {
-  return Math.round(Math.random() * (max - min) + min);
+const parseUrl = (url = '') => {
+  const link = decodeURIComponent(url)
+  const reg = /^(?:([\w.+-]+):\/\/)?(?:([^\s:]+):([^@]*)@)?([^\s:\/]+)(?::(\d+))?(\/[^\s?#]*)?(\?[^\s#]*)?(#\S*$)?/i
+  const result = reg.exec(link) || []
+  return {
+    href: result[0] || "",
+    protocol: result[1] || '',
+    username: result[2] || '',
+    password: result[3] || '',
+    hostname: result[4] || '',
+    port: link ? +result[5] || 80 : '',
+    path: link ? result[6] || '/' : '',
+    query: getUrlQuery(result[7] || ''),
+    hash: result[8] || ''
+  }
 }
+
 
 
 /**
@@ -296,7 +338,7 @@ function formatDate(date = Date.now(), formatter = 'yyyy-MM-dd hh:mm:ss') {
  */
 function hexToRGB(hex, toFixed = 1) {
   const h = hex.replace(/^\#/, '');
-  const h1 = h.length === 3 ? [...h].map(item => item + item).join('') : h;
+  const h1 = h.length === 3 ? h.slice().map(item => item + item).join('') : h;
   const alpha = h1.length === 8;
   const h2 = parseInt(h1, 16);
   const r = (h2 >>> (alpha ? 24 : 16));
@@ -462,6 +504,11 @@ export {
   isNull,
   isUndefined,
   isNaN,
+  isLeapYear,
+  isTelephoneNum,
+  isCellphoneNum,
+  isEmail,
+  isIdCardNum,
   isIOS,
   isAndroid,
   extend,
