@@ -2,36 +2,36 @@
  
 ### [list](list)
 
-- [getType](getType)
-- [hasKey](hasKey)
-- [random](random)
-- [is](is)
-- [isNumber](isNumber)
-- [isString](isString)
-- [isBoolean](isBoolean)
-- [isFunction](isFunction)
-- [isObject](isObject)
-- [isArray](isArray)
-- [isDate](isDate)
-- [isRegExp](isRegExp)
-- [isUndefined](isUndefined)
-- [isNull](isNull)
-- [isNaN](isNaN)
-- [isPrimitive](isPrimitive)
-- [isEmptyValue](isEmptyValue)
-- [isMathEqual](isMathEqual)
-- [isEqual](isEqual)
-- [isLeapYear](isLeapYear)
-- [clone](clone)
-- [dateFormatter](dateFormatter)
-- [timeAgo](timeAgo)
-- [bytesToSize](bytesToSize)
-- [sizeToBytes](sizeToBytes)
-- [hexToRgb](hexToRgb)
-- [rgbToHex](rgbToHex)
-- [paging](paging)
-- [getUrlQuery](getUrlQuery)
-- [parseUrl](parseUrl)
+- [getType](#getType)
+- [hasKey](#hasKey)
+- [random](#random)
+- [is](#is)
+- [isNumber](#isNumber)
+- [isString](#isString)
+- [isBoolean](#isBoolean)
+- [isFunction](#isFunction)
+- [isObject](#isObject)
+- [isArray](#isArray)
+- [isDate](#isDate)
+- [isRegExp](#isRegExp)
+- [isUndefined](#isUndefined)
+- [isNull](#isNull)
+- [isNaN](#isNaN)
+- [isPrimitive](#isPrimitive)
+- [isEmptyValue](#isEmptyValue)
+- [isMathEqual](#isMathEqual)
+- [isEqual](#isEqual)
+- [isLeapYear](#isLeapYear)
+- [clone](#clone)
+- [dateFormatter](#dateFormatter)
+- [timeAgo](#timeAgo)
+- [bytesToSize](#bytesToSize)
+- [sizeToBytes](#sizeToBytes)
+- [hexToRgb](#hexToRgb)
+- [rgbToHex](#rgbToHex)
+- [paging](#paging)
+- [getUrlQuery](#getUrlQuery)
+- [parseUrl](#parseUrl)
 
 
 
@@ -46,7 +46,7 @@
 
 **return:** String
 
-[↑ BackToList](list)
+[↑ BackToList](#list)
 
 
 ### hasKey
@@ -60,7 +60,7 @@ returns a boolean indicating whether the object has the specified property as it
 
 **return:** Boolean
 
-[↑ BackToList](list)
+[↑ BackToList](#list)
 
 
 ### random
@@ -74,7 +74,7 @@ returns a boolean indicating whether the object has the specified property as it
  
  **return:** Number(int)
 
-[↑ BackToList](list)
+[↑ BackToList](#list)
 
 
 ### is
