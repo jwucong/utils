@@ -283,6 +283,9 @@ export function clone(value, deep = false) {
  * @return {String}
  */
 export function dateFormatter(date, format = 'YYYY-MM-DD hh:mm:ss') {
+  if(typeof date === 'string') {
+    date = date.replace(/-/g, '/')
+  }
   const dt = new Date(date)
   if(!dt.getTime()) {
     return NaN
