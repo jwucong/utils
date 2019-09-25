@@ -406,7 +406,7 @@ export function sizeToBytes(size, base = 1000) {
  *   hexToRGB('#abcdef80') => rgba(171, 205, 239, 0.5)
  *   hexToRGB('#abcdef80', 2) => rgba(171, 205, 239, 0.50)
  */
-export function hexToRGB(hex, toFixed = 1) {
+export function hexToRgb(hex, toFixed = 1) {
   const h = hex.replace(/^\#/, '');
   const h1 = h.length === 3 ? h.slice().map(item => item + item).join('') : h;
   const alpha = h1.length === 8;
@@ -431,7 +431,7 @@ export function hexToRGB(hex, toFixed = 1) {
  *   RGBToHex(0, 0, 0) => 000000
  *   RGBToHex(255, 255, 255) => ffffff
  */
-export function RGBToHex(r, g, b) {
+export function rgbToHex(r, g, b) {
   return ((r << 16) + (g << 8) + b).toString(16).padStart(6, '0');
 }
 
