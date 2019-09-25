@@ -257,8 +257,8 @@ undefined, null, NaN, "", "   "
  **grammar:** isEqual(a, b)  
  **param:**
  
- 1. a\<Number\>
- 2. b\<Number\>
+ 1. a\<any\>
+ 2. b\<any\>
  
  **return:** Boolean
 
@@ -293,7 +293,7 @@ undefined, null, NaN, "", "   "
 
 ### dateFormatter
 
- **grammar:** clone(date[, format])  
+ **grammar:** dateFormatter(date[, format])  
  **param:**
  
  1. date\<Date,String\>
