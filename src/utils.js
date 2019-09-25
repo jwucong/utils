@@ -313,39 +313,42 @@ export function dateFormatter(date, format = 'YYYY-MM-DD hh:mm:ss') {
 }
 
 /**
- * TODO 待完善
- * 多久之前
- * @param timestamp  {Date|String|Number}
- * @return {string}
+ * 粗略计算时间差
+ * @param oldDate  {Date|String}
+ * @param nowDate  {Date|String}
+ * @return {String}
  */
-export function timeAgo(timestamp) {
-  const ago = new Date(timestamp).getTime()
-  if(!ago) {
-    return NaN
+function timeAgo(oldDate, nowDate) {
+  const toDate = date => {
+    if(typeof date === 'string') {
+      date = new Date(date.trim().replace(/-/g, '/'))
+    }
+    date = date ? new Date(date) : new Date()
+    return date.getTime() ? date : new Date()
   }
-  const min = 60 * 1000;
-  const hour = min * 60;
-  const day = hour * 24;
-  const week = day * 7;
-  const month = week * 4;
-  const year = month * 12;
-  const now = Date.now()
-  const delta = Math.floor(now - ago)
-  if(delta < min) {
-    return '刚刚'
-  } else if(delta < hour) {
-    return Math.ceil(delta / min) + '分钟前'
-  } else if(delta < day) {
-    return Math.ceil(delta / hour) + '小时前'
-  } else if(delta < week) {
-    return Math.ceil(delta / day) + '天前'
-  } else if(delta < month) {
-    return Math.ceil(delta / week) + '周前'
-  } else if(delta < year) {
-    return Math.ceil(delta / month) + '个月前'
-  } else {
-    return Math.ceil(delta / year) + '年前'
+  const old = toDate(oldDate).getTime()
+  const now = toDate(nowDate).getTime()
+  const isAgo = now >= old
+  const delta = Math.abs(Math.ceil((now - old) / 1000))
+  const units = ['刚刚', '分钟', '小时', '天', '周', '个月', '年']
+  const min = 60
+  const hour = 60 * min
+  const day = 24 * hour
+  const values = [
+    Math.floor(delta / (365 * day)),
+    Math.floor(delta / (30 * day) % 12),
+    Math.floor(delta / (7 * day) % 7),
+    Math.floor(delta / day),
+    Math.floor(delta / hour % 24),
+    Math.floor(delta / min % min),
+    ' '
+  ]
+  const format = (val = '', i = 0) => {
+    const suffix = i > 0 ? isAgo ? '前' : '后' : ''
+    return (val + '').trim() + units[i] + suffix
   }
+  const index = values.findIndex(Boolean)
+  return format(values[index], units.length - 1 - index)
 }
 
 /**
@@ -452,35 +455,55 @@ export function paging(data, size) {
  * @return {Object}
  */
 export function getUrlQuery(url) {
-  const reg = /[?&]([^=&#]+)=([^&#]*)/ig
+  const reg = /[?&]([^=&#]+)(?:=([^&#]*))?/ig
   const result = {}
-  let p = null
-  while (p = reg.exec(url)) {
+  let p = reg.exec(url)
+  while (p) {
     const key = decodeURIComponent(p[1])
-    result[key] = decodeURIComponent(p[2] || '')
+    result[key] = p[2] ? decodeURIComponent(p[2]) : ''
+    p = reg.exec(url)
   }
   return result;
 }
 
 /**
- * TODO 待完善
  * 解析url
  * @param url {String}
  * @return {Object}
  */
 export function parseUrl(url) {
-  const link = decodeURIComponent(url)
-  const reg = /^(?:([\w.+-]+):\/\/)?(?:([^\s:]+):([^@]*)@)?([^\s:\/]+)(?::(\d+))?(\/[^\s?#]*)?(\?[^\s#]*)?(#\S*$)?/i
-  const result = reg.exec(link) || []
-  return {
-    href: result[0] || "",
-    protocol: result[1] || '',
-    username: result[2] || '',
-    password: result[3] || '',
-    hostname: result[4] || '',
-    port: link ? +result[5] || 80 : '',
-    path: link ? result[6] || '/' : '',
-    query: getUrlQuery(result[7] || ''),
-    hash: result[8] || ''
+  const pattern = /^(?:(?:([^\s:\/]+):)?\/\/)?(?:([^:]+):([^@]*)@)?([^\s:\/]+)(?::(\d+))?(\/[^?#]*)?(\?[^#]*)?(#.*$)?/i
+  const keys = [
+    'href',
+    'scheme',
+    'username',
+    'password',
+    'host',
+    'port',
+    'path',
+    'search',
+    'hash'
+  ]
+  const match = pattern.exec(url) || []
+  const defaultPorts = {
+    http: 80,
+    https: 443
   }
+  const result = keys.reduce((acc, key, index) => {
+    let val = match[index]
+    switch (index) {
+      case 5:
+        val = parseInt(val, 10) || defaultPorts[acc.scheme] || ''
+        break
+      case 6:
+        val = val ? decodeURIComponent(val) : '/'
+        break
+      default:
+        val = match[index] || ''
+    }
+    acc[key] = match.length ? val : ''
+    return acc
+  }, {})
+  result.query = getUrlQuery(result.search)
+  return result
 }
